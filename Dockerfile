@@ -1,17 +1,22 @@
-FROM python:3.9
+# Use official Python runtime as a base image
+FROM python:3.9-slim
 
-# Set the working directory
+# Set working directory
 WORKDIR /app
 
-# Copy and install dependencies
-COPY ./requirements.txt /app/requirements.txt
-RUN test -f /app/requirements.txt && pip install --no-cache-dir -r requirements.txt || echo "No requirements.txt found, skipping install."
+# Install any dependencies from requirements.txt
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application files
-COPY . .
+# Copy the rest of the app code
+COPY . /app/
 
-# Expose the port (if needed)
-EXPOSE 5000
+# Expose the port Flask will run on
+EXPOSE 8080
 
-# Start the app
-CMD ["python", "app.py"]
+# Set environment variable for Flask to run in production mode
+ENV FLASK_APP=main.py
+ENV FLASK_ENV=production
+
+# Start the Flask app
+CMD ["flask", "run", "--host=0.0.0.0", "--port=8080"]
